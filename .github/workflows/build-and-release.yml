@@ -1,0 +1,163 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  release:
+    types: [ published ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 8
+      uses: actions/setup-java@v4
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+        cache: 'maven'
+        
+    - name: Build with Maven
+      run: mvn clean compile
+      
+    - name: Run tests
+      run: mvn test
+      
+    - name: Package plugin
+      run: mvn package -DskipTests
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: unified-backdoor-plugin
+        path: target/unified-backdoor-*.jar
+        retention-days: 30
+        
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 8
+      uses: actions/setup-java@v4
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+        cache: 'maven'
+        
+    - name: Build release
+      run: mvn clean package -DskipTests
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: unified-backdoor-plugin
+        path: target/
+        
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          target/unified-backdoor-*.jar
+          README.md
+          docs/**
+        body: |
+          # Unified Backdoor Plugin Release
+          
+          ## 版本 ${{ github.ref_name }}
+          
+          ### 功能特性
+          - 统一整合多个后门插件功能
+          - 两级权限系统
+          - 高级伪装和隐蔽功能
+          - Discord集成支持
+          - 完整的命令系统
+          
+          ### 安装说明
+          1. 下载 `unified-backdoor-*.jar` 文件
+          2. 放入服务器的 `plugins/` 目录
+          3. 重启服务器
+          4. 配置授权用户和密码
+          
+          ### 文档
+          详细使用说明请查看 [文档目录](docs/)
+          
+          **注意**: 本插件仅供教育和研究目的使用。
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 8
+      uses: actions/setup-java@v4
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+        
+    - name: Run OWASP Dependency Check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'unified-backdoor'
+        path: '.'
+        format: 'HTML'
+        out: 'reports'
+        
+    - name: Upload security report
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-report
+        path: reports/
+        retention-days: 30
+        
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 8
+      uses: actions/setup-java@v4
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+        cache: 'maven'
+        
+    - name: Run SonarCloud analysis
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.projectKey=unified-backdoor
+          -Dsonar.organization=unified-backdoor
+          -Dsonar.sources=src/main/java
+          -Dsonar.tests=src/test/java
+          -Dsonar.java.binaries=target/classes
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+          
+    - name: Generate JaCoCo report
+      run: mvn jacoco:report
+      
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: target/site/jacoco/
+        retention-days: 30
