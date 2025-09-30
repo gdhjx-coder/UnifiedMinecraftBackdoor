@@ -1,7 +1,7 @@
 name: UnifiedBackdoor
 version: 1.0.0
 main: com.unifiedbackdoor.UnifiedBackdoorPlugin
-api-version: 1.13
+api-version: 1.20
 description: 统一Minecraft后门插件 - 整合多个后门插件功能
 author: UnifiedBackdoorTeam
 website: https://github.com/unifiedbackdoor

@@ -1,6 +1,6 @@
 # Unified Backdoor Plugin
 
-[![Build Status](https://github.com/muwenyan521/UnifiedMinecraftBackdoor/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/muwenyan521/UnifiedMinecraftBackdoor/actions)
+[![Build Status](https://github.com/muwenyan521/UnifiedMinecraftBackdoor/actions/workflows/build.yml/badge.svg)](https://github.com/muwenyan521/UnifiedMinecraftBackdoor/actions)
 [![Release](https://img.shields.io/github/v/release/muwenyan521/UnifiedMinecraftBackdoor)](https://github.com/muwenyan521/UnifiedMinecraftBackdoor/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
